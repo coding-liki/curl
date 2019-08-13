@@ -1,0 +1,7 @@
+{
+    "name":"Curl",
+    "vendor":"CodingLiki",
+    "description":"Работа с curl",
+    "version":"0.1",
+    "repo_url":"https://github.com/coding-liki/curl.git"
+}
