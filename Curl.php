@@ -18,14 +18,14 @@ class Curl{
      * @return void
      */
     public static function post($url, $data=[], $headers = [], $return_transfer = true){
-        self::initCurl($url, $headers, $return_transfer);
+        self::init($url, $headers, $return_transfer);
 
-        self::setCurlOpt(CURLOPT_POST, 1);
-        self::setCurlOpt(CURLOPT_POSTFIELDS,$data);
+        self::setOpt(CURLOPT_POST, 1);
+        self::setOpt(CURLOPT_POSTFIELDS,$data);
         
-        $server_output = curl_exec(self::$curl_object);
+        $server_output = self::execute();
 
-        self::closeCurl();
+        self::close();
         return $server_output;
     }
 
@@ -37,14 +37,14 @@ class Curl{
      * @return void
      */
     public static function get($url,$headers = [], $return_transfer = true){
-        self::initCurl($url, $headers, $return_transfer);
+        self::init($url, $headers, $return_transfer);
     
-        $server_output = curl_exec(self::$curl_object);
-        self::closeCurl();
+        $server_output =  self::execute();
+        self::close();
         return $server_output;
     }
 
-    public static function initCurl($url = "", $headers = [], $return_transfer = true){
+    public static function init($url = "", $headers = [], $return_transfer = true){
         self::$curl_object = curl_init();
         if ($url != "") {
             self::setUrl($url);
@@ -57,23 +57,27 @@ class Curl{
         }
     }
 
-    public static function closeCurl(){
+    public static function execute(){
+        return curl_exec(self::$curl_object);
+    }
+
+    public static function close(){
         curl_close (self::$curl_object);
         self::$curl_object = null;
     }
 
     public static function setUrl($url){
-        self::setCurlOpt(CURLOPT_URL, self::$base_url.$url);
+        self::setOpt(CURLOPT_URL, self::$base_url.$url);
     }
 
     public static function setRT(){
-        self::setCurlOpt( CURLOPT_RETURNTRANSFER, true);
+        self::setOpt( CURLOPT_RETURNTRANSFER, true);
     }
 
     public static function setHeaders($headers){
-        self::setCurlOpt( CURLOPT_HTTPHEADER, self::prepareHeaders($headers));        
+        self::setOpt( CURLOPT_HTTPHEADER, self::prepareHeaders($headers));        
     }
-    
+
     public static function prepareHeaders($headers){
         $all_headers = $headers + self::$base_headers;
         $prepared_headers = [];
@@ -85,13 +89,13 @@ class Curl{
         return $prepared_headers;
     }
     
-    public static function setCurlOpt($opt, $value){
+    public static function setOpt($opt, $value){
         curl_setopt(self::$curl_object, $opt, $value);
     }
 
-    public static function setCurlOptions($options){
+    public static function setOptions($options){
         if(self::$curl_object == null){
-            self::initCurl();
+            self::init();
         }
         foreach($options as $key => $option){
             switch($key){
@@ -102,7 +106,7 @@ class Curl{
                     self::setUrl($option);
                     break;
                 default:
-                    self::setCurlOpt($key, $option);
+                    self::setOpt($key, $option);
             }
         }
     }
